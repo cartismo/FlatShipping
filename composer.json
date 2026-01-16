@@ -1,0 +1,25 @@
+{
+    "name": "cartismo/flat-shipping",
+    "description": "Flat rate shipping module for Cartismo",
+    "type": "cartismo-module",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Cartismo",
+            "email": "support@cartismo.com"
+        }
+    ],
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\FlatShipping\\Providers\\FlatShippingServiceProvider"
+            ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\FlatShipping\\": ""
+        }
+    }
+}
