@@ -7,6 +7,33 @@ use App\Models\InstalledModule;
 
 class FlatShippingService extends AbstractShippingMethod
 {
+    public static function defaultSettings(): array
+    {
+        return [
+            'enabled' => true,
+            'title' => self::resolveDefaultTranslation('default_title', 'Flat Shipping'),
+            'description' => self::resolveDefaultTranslation('default_description', 'Standard delivery to address'),
+            'cost' => 0.00,
+            'free_shipping_threshold' => null,
+            'sort_order' => 0,
+        ];
+    }
+
+    protected static function resolveDefaultTranslation(string $key, string $fallback): string
+    {
+        $translationKey = 'flatshipping::settings.' . $key;
+        $translated = trans($translationKey);
+
+        if ($translated !== $translationKey) {
+            return $translated;
+        }
+
+        $fallbackLocale = config('app.fallback_locale', 'en');
+        $fallbackTranslation = trans($translationKey, [], $fallbackLocale);
+
+        return $fallbackTranslation !== $translationKey ? $fallbackTranslation : $fallback;
+    }
+
     public function __construct(?InstalledModule $module = null)
     {
         // If no module passed, load it
@@ -17,15 +44,7 @@ class FlatShippingService extends AbstractShippingMethod
         parent::__construct($module);
 
         // Merge with default settings
-        $this->settings = array_replace_recursive([
-            'enabled' => true,
-            'title' => 'Стандартна доставка',
-            'description' => 'Доставка до адрес',
-            'cost' => 0.00,
-            'free_shipping_threshold' => null,
-            'tax_class' => null,
-            'sort_order' => 0,
-        ], $this->settings);
+        $this->settings = array_replace_recursive(self::defaultSettings(), $this->settings);
     }
 
     /**

@@ -3,11 +3,13 @@
 namespace Modules\FlatShipping\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Currency;
 use App\Models\InstalledModule;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\FlatShipping\Services\FlatShippingService;
 
 class FlatShippingController extends Controller
 {
@@ -18,22 +20,17 @@ class FlatShippingController extends Controller
     {
         $module = InstalledModule::where('slug', 'flat-shipping')->firstOrFail();
 
-        $defaultSettings = [
-            'enabled' => true,
-            'title' => 'Flat Rate Shipping',
-            'description' => 'Standard flat rate shipping',
-            'cost' => 0.00,
-            'free_shipping_threshold' => null,
-            'tax_class' => null,
-            'sort_order' => 0,
-        ];
-
+        $defaultSettings = FlatShippingService::defaultSettings();
         $settings = array_replace_recursive($defaultSettings, $module->settings ?? []);
 
         return Inertia::render('FlatShipping::Admin/Settings', [
             'module' => $module,
             'settings' => $settings,
             'defaultSettings' => $defaultSettings,
+            'options' => [
+                'currency' => $this->getCurrencyOptions(),
+            ],
+            'translations' => $this->getTranslations(),
         ]);
     }
 
@@ -50,14 +47,39 @@ class FlatShippingController extends Controller
             'settings.description' => 'nullable|string|max:1000',
             'settings.cost' => 'required|numeric|min:0',
             'settings.free_shipping_threshold' => 'nullable|numeric|min:0',
-            'settings.tax_class' => 'nullable|string',
             'settings.sort_order' => 'integer|min:0',
         ]);
 
         $module->update([
-            'settings' => $validated['settings'],
+            'settings' => array_replace_recursive(FlatShippingService::defaultSettings(), $validated['settings']),
         ]);
 
-        return back()->with('success', 'Shipping settings updated successfully.');
+        return back()->with('success', __('flatshipping::settings.saved_successfully'));
+    }
+
+    protected function getTranslations(): array
+    {
+        $locale = app()->getLocale();
+        $fallbackLocale = config('app.fallback_locale', 'en');
+
+        $translations = trans('flatshipping::settings');
+
+        if (!is_array($translations)) {
+            $translations = trans('flatshipping::settings', [], $fallbackLocale);
+        }
+
+        return is_array($translations) ? $translations : [];
+    }
+
+    protected function getCurrencyOptions(): array
+    {
+        $currency = Currency::getBaseCurrency();
+
+        return [
+            'code' => $currency?->code ?? 'EUR',
+            'symbol' => $currency?->symbol,
+            'symbol_left' => $currency?->symbol_left,
+            'symbol_right' => $currency?->symbol_right,
+        ];
     }
 }
