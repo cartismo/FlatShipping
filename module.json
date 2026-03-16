@@ -3,13 +3,14 @@
     "alias": "flatshipping",
     "description": "Simple flat rate shipping with configurable fixed costs. Supports free shipping threshold.",
     "version": "1.0.0",
-    "keywords": [],
+    "keywords": ["shipping", "flat rate", "fixed cost", "delivery"],
     "priority": 0,
     "providers": [
         "Modules\\FlatShipping\\Providers\\FlatShippingServiceProvider"
     ],
-    "aliases": [],
+    "aliases": {},
     "files": [],
     "requires": [],
-    "type": "shipping"
+    "type": "shipping",
+    "is_core": true
 }
