@@ -3,7 +3,6 @@
 namespace Modules\FlatShipping\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Currency;
 use App\Traits\HasMultiStoreModuleSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -58,15 +57,4 @@ class FlatShippingController extends Controller
         return $this->saveStoreSettings($request);
     }
 
-    protected function getCurrencyOptions(): array
-    {
-        $currency = Currency::getBaseCurrency();
-
-        return [
-            'code' => $currency?->code ?? 'EUR',
-            'symbol' => $currency?->symbol,
-            'symbol_left' => $currency?->symbol_left,
-            'symbol_right' => $currency?->symbol_right,
-        ];
-    }
 }
