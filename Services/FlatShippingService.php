@@ -11,15 +11,15 @@ class FlatShippingService extends AbstractShippingMethod
     {
         return [
             'enabled' => true,
-            'title' => self::resolveDefaultTranslation('default_title', 'Flat Shipping'),
-            'description' => self::resolveDefaultTranslation('default_description', 'Standard delivery to address'),
+            'title' => self::translateSetting('default_title'),
+            'description' => self::translateSetting('default_description'),
             'cost' => 0.00,
             'free_shipping_threshold' => null,
             'sort_order' => 0,
         ];
     }
 
-    protected static function resolveDefaultTranslation(string $key, string $fallback): string
+    protected static function translateSetting(string $key): string
     {
         return __('flatshipping::settings.' . $key);
     }

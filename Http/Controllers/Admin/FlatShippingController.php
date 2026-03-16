@@ -4,7 +4,7 @@ namespace Modules\FlatShipping\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
-use App\Models\InstalledModule;
+use App\Traits\HasMultiStoreModuleSettings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,25 +13,30 @@ use Modules\FlatShipping\Services\FlatShippingService;
 
 class FlatShippingController extends Controller
 {
+    use HasMultiStoreModuleSettings;
+
+    protected function getModuleSlug(): string
+    {
+        return 'flat-shipping';
+    }
+
+    protected function getDefaultSettings(): array
+    {
+        return FlatShippingService::defaultSettings();
+    }
+
     /**
      * Show shipping method settings
      */
     public function index(): Response
     {
-        $module = InstalledModule::where('slug', 'flat-shipping')->firstOrFail();
+        $data = $this->getMultiStoreData();
+        $data['options'] = [
+            'currency' => $this->getCurrencyOptions(),
+        ];
+        $data['translations'] = __('flatshipping::settings');
 
-        $defaultSettings = FlatShippingService::defaultSettings();
-        $settings = array_replace_recursive($defaultSettings, $module->settings ?? []);
-
-        return Inertia::render('FlatShipping::Admin/Settings', [
-            'module' => $module,
-            'settings' => $settings,
-            'defaultSettings' => $defaultSettings,
-            'options' => [
-                'currency' => $this->getCurrencyOptions(),
-            ],
-            'translations' => __('flatshipping::settings'),
-        ]);
+        return Inertia::render('FlatShipping::Admin/Settings', $data);
     }
 
     /**
@@ -39,9 +44,9 @@ class FlatShippingController extends Controller
      */
     public function update(Request $request): RedirectResponse
     {
-        $module = InstalledModule::where('slug', 'flat-shipping')->firstOrFail();
-
-        $validated = $request->validate([
+        $request->validate([
+            'store_id' => 'required|exists:stores,id',
+            'is_enabled' => 'boolean',
             'settings.enabled' => 'boolean',
             'settings.title' => 'required|string|max:255',
             'settings.description' => 'nullable|string|max:1000',
@@ -50,11 +55,7 @@ class FlatShippingController extends Controller
             'settings.sort_order' => 'integer|min:0',
         ]);
 
-        $module->update([
-            'settings' => array_replace_recursive(FlatShippingService::defaultSettings(), $validated['settings']),
-        ]);
-
-        return back()->with('success', __('flatshipping::settings.saved_successfully'));
+        return $this->saveStoreSettings($request);
     }
 
     protected function getCurrencyOptions(): array

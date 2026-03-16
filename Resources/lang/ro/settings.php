@@ -5,6 +5,7 @@ return [
     'reset' => 'Reset',
     'reset_confirm' => 'Reset all settings to their defaults?',
     'save_changes' => 'Save Changes',
+    'saving' => 'Saving...',
     'unsaved_changes' => 'Unsaved changes',
     'saved_successfully' => 'Shipping settings updated successfully.',
     'validation_failed' => 'Please fix the highlighted fields and try again.',
