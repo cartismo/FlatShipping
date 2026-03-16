@@ -30,7 +30,7 @@ class FlatShippingController extends Controller
             'options' => [
                 'currency' => $this->getCurrencyOptions(),
             ],
-            'translations' => $this->getTranslations(),
+            'translations' => __('flatshipping::settings'),
         ]);
     }
 
@@ -55,20 +55,6 @@ class FlatShippingController extends Controller
         ]);
 
         return back()->with('success', __('flatshipping::settings.saved_successfully'));
-    }
-
-    protected function getTranslations(): array
-    {
-        $locale = app()->getLocale();
-        $fallbackLocale = config('app.fallback_locale', 'en');
-
-        $translations = trans('flatshipping::settings');
-
-        if (!is_array($translations)) {
-            $translations = trans('flatshipping::settings', [], $fallbackLocale);
-        }
-
-        return is_array($translations) ? $translations : [];
     }
 
     protected function getCurrencyOptions(): array

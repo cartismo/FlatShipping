@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { Link, useForm } from '@inertiajs/vue3';
+import { useConfirmDialog } from '@/Composables/useConfirmDialog.js';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import {
     TruckIcon,
@@ -33,6 +34,8 @@ const t = (key, replacements = {}) => {
     return text;
 };
 
+const { confirm } = useConfirmDialog();
+
 const form = useForm({
     settings: JSON.parse(JSON.stringify(props.settings)),
 });
@@ -61,8 +64,13 @@ const submit = () => {
     form.put(route('admin.shipping.flat.settings.update'));
 };
 
-const resetAll = () => {
-    if (confirm(t('reset_confirm'))) {
+const resetAll = async () => {
+    const confirmed = await confirm({
+        title: t('reset'),
+        message: t('reset_confirm'),
+        variant: 'warning',
+    });
+    if (confirmed) {
         form.settings = JSON.parse(JSON.stringify(props.defaultSettings));
     }
 };

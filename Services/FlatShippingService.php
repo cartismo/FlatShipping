@@ -21,17 +21,7 @@ class FlatShippingService extends AbstractShippingMethod
 
     protected static function resolveDefaultTranslation(string $key, string $fallback): string
     {
-        $translationKey = 'flatshipping::settings.' . $key;
-        $translated = trans($translationKey);
-
-        if ($translated !== $translationKey) {
-            return $translated;
-        }
-
-        $fallbackLocale = config('app.fallback_locale', 'en');
-        $fallbackTranslation = trans($translationKey, [], $fallbackLocale);
-
-        return $fallbackTranslation !== $translationKey ? $fallbackTranslation : $fallback;
+        return __('flatshipping::settings.' . $key);
     }
 
     public function __construct(?InstalledModule $module = null)
